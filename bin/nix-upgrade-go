@@ -1,0 +1,31 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -i bash -p git go go2nix
+
+set -euo pipefail
+
+FILE=${1:-"default.nix"}
+PROJECT=$(grep "goPackagePath =" ${FILE} | cut -f2 -d '"')
+VERSION=$(grep "version ="       ${FILE} | cut -f2 -d '"')
+DEPS=$(grep goDeps ${FILE} | cut -f2 -d '=' | cut -f1 -d ';' | sed 's/ //g')
+
+if [ -z ${DEPS} ]; then
+  DEPS=deps.nix
+  echo "${DEPS} not found. You probably do not need this script."
+fi
+
+DEPS=$(dirname ${FILE})/${DEPS}
+
+export TMPDIR=/tmp
+
+t=$(mktemp -d)
+
+pushd $t
+export GOPATH=$(pwd)
+mkdir -p bin pkg src/${PROJECT}
+git clone https://${PROJECT} src/${PROJECT}
+cd src/${PROJECT}
+git checkout -b build_v${VERSION} v${VERSION}
+go get && go build && go2nix save
+
+popd
+cp $t/src/${PROJECT}/deps.nix ${DEPS}

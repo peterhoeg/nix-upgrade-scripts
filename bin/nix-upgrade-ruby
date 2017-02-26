@@ -1,0 +1,17 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -i bash -p bundler bundix
+
+set -euo pipefail
+
+target=${1:-"."}
+
+if [ -d $target ] ; then
+  dir=$target
+else
+  dir=$(dirname $target)
+fi
+
+pushd $dir >/dev/null
+bundle lock --update
+bundix
+popd

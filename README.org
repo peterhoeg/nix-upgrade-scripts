@@ -1,0 +1,7 @@
+* nix-upgrade-scripts
+
+A set of very basic scripts that allow nixpkgs package maintainers to easily
+upgrade their packages:
+
+- nix-upgrade-go
+- nix-upgrade-ruby
