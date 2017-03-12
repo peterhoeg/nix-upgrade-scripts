@@ -6,9 +6,10 @@ set -euo pipefail
 FILE=${1:-"default.nix"}
 PROJECT=$(grep "goPackagePath =" ${FILE} | cut -f2 -d '"')
 VERSION=$(grep "version ="       ${FILE} | cut -f2 -d '"')
-DEPS=$(grep goDeps ${FILE} | cut -f2 -d '=' | cut -f1 -d ';' | sed 's/ //g')
 
-if [ -z ${DEPS} ]; then
+if grep -q goDeps ${FILE} ; then
+  DEPS=$(grep goDeps ${FILE} | cut -f2 -d '=' | cut -f1 -d ';' | sed 's/ //g')
+else
   DEPS=deps.nix
   echo "${DEPS} not found. You probably do not need this script."
 fi
