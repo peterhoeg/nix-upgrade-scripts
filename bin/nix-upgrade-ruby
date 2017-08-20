@@ -12,6 +12,6 @@ else
 fi
 
 pushd $dir >/dev/null
-bundle lock --update
-bundix
+# bundle lock --update
+bundix --magic
 popd
