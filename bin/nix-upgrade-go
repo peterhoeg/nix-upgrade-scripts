@@ -1,7 +1,9 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p gcc git go go2nix pkgconfig
+#!nix-shell -i bash -p gcc git go go-dependency-manager go2nix pkgconfig
 
 set -euo pipefail
+
+set -x
 
 FILE=${1:-"default.nix"}
 PROJECT=$(grep "goPackagePath =" ${FILE} | cut -f2 -d '"')
@@ -26,7 +28,18 @@ mkdir -p bin pkg src/${PROJECT}
 git clone https://${PROJECT} src/${PROJECT}
 cd src/${PROJECT}
 git checkout -b build_v${VERSION} v${VERSION}
-go get && go build && go2nix save
+
+if [ -f Godeps ] ; then
+  gdm restore
+  go install
+fi
+
+go get
+
+go build
+
+go2nix save
 
 popd
+# cp $t/brew.file ${DEPS}.brew
 cp $t/src/${PROJECT}/deps.nix ${DEPS}
