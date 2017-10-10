@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p gcc git go go-dependency-manager go2nix pkgconfig
+#!nix-shell -i bash -p gcc git go go-dependency-manager go2nix pkgconfig tree
 
 set -euo pipefail
 
@@ -32,6 +32,9 @@ git checkout -b build_v${VERSION} v${VERSION}
 if [ -f Godeps ] ; then
   gdm restore
   go install
+elif [ -d Godeps ] ; then
+  cp -r Godeps/_workspace/src/* $GOPATH/src
+  chmod o+w $GOPATH/{pkg,src} -R
 fi
 
 go get
